@@ -19,26 +19,16 @@ var renderCloud = function (ctx, x, y, color) {
   ctx.fillRect(x, y, CLOUD_WIDTH, CLOUD_HEIGHT);
 };
 
-var renderBars = function (ctx, x, y, width, height) {
-  ctx.fillStyle = 'hsl(237, 100%,' + randomizeInteger(1, 100) + '%)';
-  ctx.fillRect(x, y, width, height);
-};
-
-var renderBar = function (ctx, x, y, width, height) {
-  ctx.fillStyle = 'rgba(255, 0, 0, 1)';
-  ctx.fillRect(x, y, width, height);
-};
-
-var renderName = function (ctx, arr, x, y) {
+var renderName = function (ctx, name, x, y) {
   ctx.fillStyle = '#000';
   ctx.textAlign = 'left';
-  ctx.fillText(arr, x, y);
+  ctx.fillText(name, x, y);
 };
 
-var renderTime = function (ctx, arr, x, y) {
+var renderTime = function (ctx, time, x, y) {
   ctx.fillStyle = '#000';
   ctx.textAlign = 'left';
-  ctx.fillText(Math.floor(arr), x, y);
+  ctx.fillText(Math.floor(time), x, y);
 };
 
 var drawMultilineText = function (ctx, arr) {
@@ -81,11 +71,17 @@ window.renderStatistics = function (ctx, names, times) {
     var barPositionX = CLOUD_X + GAP * 3 + (BAR_SPACE + BAR_WIDTH) * i;
     var barPositionY = CLOUD_HEIGHT - barCurrentHeight - GAP * 2.5;
 
+    var renderBars = function () {
+      ctx.fillRect(barPositionX, barPositionY, BAR_WIDTH, barCurrentHeight);
+    };
+
     if (names[i] === 'Вы') {
-      renderBar(ctx, barPositionX, barPositionY, BAR_WIDTH, barCurrentHeight);
+      ctx.fillStyle = 'rgba(255, 0, 0, 1)';
     } else {
-      renderBars(ctx, barPositionX, barPositionY, BAR_WIDTH, barCurrentHeight);
+      ctx.fillStyle = 'hsl(237, 100%,' + randomizeInteger(1, 100) + '%)';
     }
+
+    renderBars();
 
     renderName(ctx, names[i], barPositionX, CLOUD_HEIGHT - barCurrentHeight - GAP * 3.5);
 
