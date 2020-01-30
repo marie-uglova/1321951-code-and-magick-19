@@ -19,18 +19,6 @@ var renderCloud = function (ctx, x, y, color) {
   ctx.fillRect(x, y, CLOUD_WIDTH, CLOUD_HEIGHT);
 };
 
-var renderName = function (ctx, name, x, y) {
-  ctx.fillStyle = '#000';
-  ctx.textAlign = 'left';
-  ctx.fillText(name, x, y);
-};
-
-var renderTime = function (ctx, time, x, y) {
-  ctx.fillStyle = '#000';
-  ctx.textAlign = 'left';
-  ctx.fillText(Math.floor(time), x, y);
-};
-
 var drawMultilineText = function (ctx, arr) {
   ctx.fillStyle = '#000';
   ctx.font = '16px PT Mono';
@@ -54,11 +42,52 @@ var getMaxElement = function (arr) {
 
 var randomizeInteger = function (min, max) {
   var rand = min + Math.random() * (max + 1 - min);
+
   return Math.floor(rand);
 };
 
-window.renderStatistics = function (ctx, names, times) {
+var renderBars = function (ctx, names, times, x, y) {
   var maxTime = getMaxElement(times);
+
+  for (var i = 0; i < times.length; i++) {
+    var barCurrentHeight = BAR_HEIGHT / (maxTime / times[i]);
+    var barPositionX = (BAR_SPACE + BAR_WIDTH) * i;
+    var barPositionY = CLOUD_HEIGHT - barCurrentHeight;
+    var barColor = (names[i] === 'Вы') ? 'rgba(255, 0, 0, 1)' : 'hsl(237, 100%,' + randomizeInteger(1, 100) + '%)';
+
+    ctx.fillStyle = barColor;
+    ctx.fillRect(barPositionX + x, barPositionY - y, BAR_WIDTH, barCurrentHeight);
+  }
+};
+
+var renderNames = function (ctx, names, times, x, y) {
+  var maxTime = getMaxElement(times);
+
+  for (var i = 0; i < names.length; i++) {
+    var barCurrentHeight = BAR_HEIGHT / (maxTime / times[i]);
+    var barPositionX = (BAR_SPACE + BAR_WIDTH) * i;
+    var barPositionY = CLOUD_HEIGHT - barCurrentHeight;
+
+    ctx.fillStyle = '#000';
+    ctx.textAlign = 'left';
+    ctx.fillText(names[i], barPositionX + x, barPositionY - y);
+  }
+};
+
+var renderTimes = function (ctx, names, times, x, y) {
+  for (var i = 0; i < names.length; i++) {
+    var barPositionX = (BAR_SPACE + BAR_WIDTH) * i;
+
+    ctx.fillStyle = '#000';
+    ctx.textAlign = 'left';
+    ctx.fillText(Math.floor(times[i]), barPositionX + x, y);
+  }
+};
+
+window.renderStatistics = function (ctx, names, times) {
+  var barSpaceX = CLOUD_X + GAP * 3;
+  var barSpaceY = GAP * 2.5;
+  var nameSpaceY = GAP * 3.5;
 
   renderCloud(ctx, CLOUD_X + GAP, CLOUD_Y + GAP, 'rgba(0, 0, 0, 0.7)');
 
@@ -66,25 +95,10 @@ window.renderStatistics = function (ctx, names, times) {
 
   drawMultilineText(ctx, stringsText);
 
-  for (var i = 0; i < names.length; i++) {
-    var barCurrentHeight = BAR_HEIGHT / (maxTime / times[i]);
-    var barPositionX = CLOUD_X + GAP * 3 + (BAR_SPACE + BAR_WIDTH) * i;
-    var barPositionY = CLOUD_HEIGHT - barCurrentHeight - GAP * 2.5;
+  renderBars(ctx, names, times, barSpaceX, barSpaceY);
 
-    var renderBars = function () {
-      ctx.fillRect(barPositionX, barPositionY, BAR_WIDTH, barCurrentHeight);
-    };
+  renderNames(ctx, names, times, barSpaceX, nameSpaceY);
 
-    if (names[i] === 'Вы') {
-      ctx.fillStyle = 'rgba(255, 0, 0, 1)';
-    } else {
-      ctx.fillStyle = 'hsl(237, 100%,' + randomizeInteger(1, 100) + '%)';
-    }
+  renderTimes(ctx, names, times, barSpaceX, CLOUD_HEIGHT - GAP / 2);
 
-    renderBars();
-
-    renderName(ctx, names[i], barPositionX, CLOUD_HEIGHT - barCurrentHeight - GAP * 3.5);
-
-    renderTime(ctx, times[i], barPositionX, CLOUD_HEIGHT - GAP / 2);
-  }
 };
